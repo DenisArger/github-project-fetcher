@@ -1,4 +1,3 @@
-````markdown
 # GitHub Project Columns Fetcher
 
 ## Project Description
@@ -6,19 +5,22 @@
 This project is a Node.js script that connects to the GitHub GraphQL API to retrieve information about a GitHub Projects V2 project. The script performs the following tasks:
 
 - Retrieves the project identifier (PROJECT_ID) by its name.
+- Supports fetching projects from both personal accounts and organizations.
 - Extracts the project's "Status" field, including its options (columns).
 - Displays a mapping of column names (e.g., "Back Log", "To Do", "In Progress", "Blocked", "Review", "Done") to corresponding variables and their identifiers.
 
 ## Features
 
 - Connects to the GitHub GraphQL API using a personal access token.
-- Dynamically retrieves project data.
+- Dynamically retrieves project data from both user and organization projects.
 - Outputs column identifiers for the "Status" field with predefined variable names.
+- Logs relevant information about the search process.
 
 ## Requirements
 
 - Node.js version 12 or higher.
 - A personal GitHub token with access rights to the GraphQL API.
+- (Optional) An organization name if querying organization projects.
 
 ## Installation
 
@@ -26,8 +28,6 @@ This project is a Node.js script that connects to the GitHub GraphQL API to retr
    ```bash
    git clone <repository_url>
    ```
-````
-
 2. Navigate to the project directory:
    ```bash
    cd <project_directory>
@@ -43,6 +43,8 @@ Create a `.env` file in the root directory of the project and add your GitHub to
 
 ```dotenv
 TOKEN_AUTOMATIZATION=your_github_token
+# Optional: Set organization name to fetch projects from an organization
+GITHUB_ORG=your_organization_name
 ```
 
 ## Running the Script

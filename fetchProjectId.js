@@ -5,6 +5,7 @@ dotenv.config();
 
 const GITHUB_API_URL = "https://api.github.com/graphql";
 const TOKEN = process.env.TOKEN_AUTOMATIZATION;
+const ORGANIZATION = process.env.GITHUB_ORG || null;
 
 if (!TOKEN) {
   throw new Error("❌ GitHub token not found in .env file.");
@@ -29,22 +30,52 @@ async function githubRequest(query) {
 }
 
 async function fetchProjectId(projectName) {
-  const query = `query {
-    viewer {
-      projectsV2(first: 10) {
-        nodes {
-          id
-          title
+  let projects = [];
+
+  if (ORGANIZATION) {
+    const orgQuery = `query {
+      organization(login: "${ORGANIZATION}") {
+        projectsV2(first: 20) {
+          nodes {
+            id
+            title
+          }
         }
       }
+    }`;
+
+    const orgData = await githubRequest(orgQuery);
+    projects = orgData?.organization?.projectsV2?.nodes || [];
+
+    if (projects.length > 0) {
+    } else {
+      console.warn("⚠️ There are no available projects in the organization.");
     }
-  }`;
+  }
 
-  const data = await githubRequest(query);
-  const project = data?.viewer?.projectsV2?.nodes.find(
-    (p) => p.title === projectName
-  );
+  if (projects.length === 0) {
+    const userQuery = `query {
+      viewer {
+        projectsV2(first: 10) {
+          nodes {
+            id
+            title
+          }
+        }
+      }
+    }`;
 
+    const userData = await githubRequest(userQuery);
+    projects = userData?.viewer?.projectsV2?.nodes || [];
+    if (projects.length > 0) {
+    } else {
+      throw new Error(
+        "❌ The projects were not found either in the organization or among the personal ones.."
+      );
+    }
+  }
+
+  const project = projects.find((p) => p.title === projectName);
   if (!project) {
     throw new Error(`❌ Project with name "${projectName}" not found.`);
   }
