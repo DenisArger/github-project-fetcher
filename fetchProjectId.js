@@ -7,7 +7,7 @@ const GITHUB_API_URL = "https://api.github.com/graphql";
 const TOKEN = process.env.TOKEN_AUTOMATIZATION;
 
 if (!TOKEN) {
-  throw new Error("❌ Токен GitHub не найден в .env файле.");
+  throw new Error("❌ GitHub token not found in .env file.");
 }
 
 async function githubRequest(query) {
@@ -22,10 +22,7 @@ async function githubRequest(query) {
 
   const data = await response.json();
   if (data.errors) {
-    console.error(
-      "❌ Ошибка GitHub API:",
-      JSON.stringify(data.errors, null, 2)
-    );
+    console.error("❌ GitHub API Error:", JSON.stringify(data.errors, null, 2));
     throw new Error("GitHub API error");
   }
   return data.data;
@@ -49,12 +46,10 @@ async function fetchProjectId(projectName) {
   );
 
   if (!project) {
-    throw new Error(`❌ Проект с названием "${projectName}" не найден.`);
+    throw new Error(`❌ Project with name "${projectName}" not found.`);
   }
 
-  console.log(`Info about "${projectName}":`);
-  console.log(``);
-
+  console.log(`Info about "${projectName}":\n`);
   console.log(`PROJECT_ID=${project.id}`);
   return project.id;
 }
@@ -90,10 +85,10 @@ async function fetchStatusField(projectId) {
   );
 
   if (!statusField) {
-    throw new Error(`❌ Поле "Status" не найдено в проекте ${projectId}.`);
+    throw new Error(`❌ Field "Status" not found in project ${projectId}.`);
   }
 
-  console.log(`ID_COLUMN_STATUS: ${statusField.id}`);
+  console.log(`ID_COLUMN_STATUS=${statusField.id}`);
   return statusField;
 }
 
@@ -101,7 +96,7 @@ async function fetchStatusField(projectId) {
   const projectName = process.argv[2];
 
   if (!projectName) {
-    console.error("❌ Укажите название проекта в аргументах.");
+    console.error("❌ Please provide a project name as an argument.");
     process.exit(1);
   }
 
@@ -111,7 +106,7 @@ async function fetchStatusField(projectId) {
 
     const columns = statusField.options;
     if (!columns) {
-      throw new Error(`❌ Для поля "Status" не найдены столбцы.`);
+      throw new Error(`❌ No columns found for the "Status" field.`);
     }
 
     const statusMapping = {
@@ -126,7 +121,7 @@ async function fetchStatusField(projectId) {
     columns.forEach((option) => {
       const varName = statusMapping[option.name];
       if (varName) {
-        console.log(`${varName} = ${option.id}`);
+        console.log(`${varName}=${option.id}`);
       }
     });
   } catch (error) {
