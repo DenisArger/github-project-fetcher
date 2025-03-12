@@ -57,12 +57,56 @@ async function fetchProjectId(projectName) {
   return project.id;
 }
 
-// Укажи название проекта, который хочешь найти
-const projectName = process.argv[2];
+async function fetchStatusFieldId(projectId) {
+  const query = `query {
+    node(id: "${projectId}") {
+      ... on ProjectV2 {
+        fields(first: 20) {
+          nodes {
+            __typename
+            ... on ProjectV2SingleSelectField {
+              id
+              name
+            }
+            ... on ProjectV2Field {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }`;
 
-if (!projectName) {
-  console.error("❌ Укажите название проекта в аргументах.");
-  process.exit(1);
+  const data = await githubRequest(query);
+  const statusField = data?.node?.fields?.nodes.find(
+    (field) => field.name === "Status"
+  );
+
+  if (!statusField) {
+    throw new Error(`❌ Поле "Status" не найдено в проекте ${projectId}.`);
+  }
+
+  console.log(`✅ ID_COLUMN_STATUS: ${statusField.id}`);
+  return statusField.id;
 }
 
-fetchProjectId(projectName).catch((error) => console.error(error.message));
+(async () => {
+  const projectName = process.argv[2];
+
+  if (!projectName) {
+    console.error("❌ Укажите название проекта в аргументах.");
+    process.exit(1);
+  }
+
+  try {
+    const projectId = await fetchProjectId(projectName);
+    const statusFieldId = await fetchStatusFieldId(projectId);
+
+    console.log("\n🔹 Итоговые данные:");
+    console.log(`PROJECT_ID = ${projectId}`);
+    console.log(`ID_COLUMN_STATUS = ${statusFieldId}`);
+  } catch (error) {
+    console.error(error.message);
+  }
+})();
