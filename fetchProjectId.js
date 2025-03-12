@@ -28,7 +28,6 @@ async function githubRequest(query) {
     );
     throw new Error("GitHub API error");
   }
-
   return data.data;
 }
 
@@ -53,11 +52,14 @@ async function fetchProjectId(projectName) {
     throw new Error(`❌ Проект с названием "${projectName}" не найден.`);
   }
 
-  console.log(`✅ PROJECT_ID для "${projectName}": ${project.id}`);
+  console.log(`Info about "${projectName}":`);
+  console.log(``);
+
+  console.log(`PROJECT_ID=${project.id}`);
   return project.id;
 }
 
-async function fetchStatusFieldId(projectId) {
+async function fetchStatusField(projectId) {
   const query = `query {
     node(id: "${projectId}") {
       ... on ProjectV2 {
@@ -67,6 +69,10 @@ async function fetchStatusFieldId(projectId) {
             ... on ProjectV2SingleSelectField {
               id
               name
+              options {
+                id
+                name
+              }
             }
             ... on ProjectV2Field {
               id
@@ -87,8 +93,8 @@ async function fetchStatusFieldId(projectId) {
     throw new Error(`❌ Поле "Status" не найдено в проекте ${projectId}.`);
   }
 
-  console.log(`✅ ID_COLUMN_STATUS: ${statusField.id}`);
-  return statusField.id;
+  console.log(`ID_COLUMN_STATUS: ${statusField.id}`);
+  return statusField;
 }
 
 (async () => {
@@ -101,11 +107,28 @@ async function fetchStatusFieldId(projectId) {
 
   try {
     const projectId = await fetchProjectId(projectName);
-    const statusFieldId = await fetchStatusFieldId(projectId);
+    const statusField = await fetchStatusField(projectId);
 
-    console.log("\n🔹 Итоговые данные:");
-    console.log(`PROJECT_ID = ${projectId}`);
-    console.log(`ID_COLUMN_STATUS = ${statusFieldId}`);
+    const columns = statusField.options;
+    if (!columns) {
+      throw new Error(`❌ Для поля "Status" не найдены столбцы.`);
+    }
+
+    const statusMapping = {
+      "Back Log": "ID_COLUMN_STATUS_BACK_LOG",
+      "To Do": "ID_COLUMN_STATUS_TO_DO",
+      "In Progress": "ID_COLUMN_STATUS_IN_PROGRESS",
+      Blocked: "ID_COLUMN_STATUS_BLOCKED",
+      Review: "ID_COLUMN_STATUS_REVIEW",
+      Done: "ID_COLUMN_STATUS_DONE",
+    };
+
+    columns.forEach((option) => {
+      const varName = statusMapping[option.name];
+      if (varName) {
+        console.log(`${varName} = ${option.id}`);
+      }
+    });
   } catch (error) {
     console.error(error.message);
   }
