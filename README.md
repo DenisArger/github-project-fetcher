@@ -52,7 +52,7 @@ GITHUB_ORG=your_organization_name
 Run the script by passing the project name as an argument. For example:
 
 ```bash
-node index.js "Project Name"
+node ./fetchProjectId.js "Project Name"
 ```
 
 After executing the script, the following will be displayed:
