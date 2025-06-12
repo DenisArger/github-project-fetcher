@@ -47,8 +47,7 @@ async function fetchProjectId(projectName) {
     const orgData = await githubRequest(orgQuery);
     projects = orgData?.organization?.projectsV2?.nodes || [];
 
-    if (projects.length > 0) {
-    } else {
+    if (projects.length === 0) {
       console.warn("⚠️ There are no available projects in the organization.");
     }
   }
@@ -67,10 +66,9 @@ async function fetchProjectId(projectName) {
 
     const userData = await githubRequest(userQuery);
     projects = userData?.viewer?.projectsV2?.nodes || [];
-    if (projects.length > 0) {
-    } else {
+    if (projects.length === 0) {
       throw new Error(
-        "❌ The projects were not found either in the organization or among the personal ones.."
+        "❌ The projects were not found either in the organization or among the personal ones."
       );
     }
   }
@@ -81,7 +79,8 @@ async function fetchProjectId(projectName) {
   }
 
   console.log(`Info about "${projectName}":\n`);
-  console.log(`PROJECT_ID=${project.id}`);
+  console.log(`ID_PROJECT=${project.id}`);
+
   return project.id;
 }
 
@@ -99,10 +98,6 @@ async function fetchStatusField(projectId) {
                 id
                 name
               }
-            }
-            ... on ProjectV2Field {
-              id
-              name
             }
           }
         }
@@ -141,6 +136,7 @@ async function fetchStatusField(projectId) {
     }
 
     const statusMapping = {
+      "Need Definition": "ID_COLUMN_STATUS_NEED_DEFINITION",
       "Back Log": "ID_COLUMN_STATUS_BACK_LOG",
       "To Do": "ID_COLUMN_STATUS_TO_DO",
       "In Progress": "ID_COLUMN_STATUS_IN_PROGRESS",
