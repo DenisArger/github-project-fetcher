@@ -135,20 +135,35 @@ async function fetchStatusField(projectId) {
       throw new Error(`❌ No columns found for the "Status" field.`);
     }
 
+    // Debug: Show all available columns
+    console.log("\n📋 Available status columns:");
+    columns.forEach((option) => {
+      console.log(`  - "${option.name}" (ID: ${option.id})`);
+    });
+    console.log();
+
     const statusMapping = {
-      "Need Definition": "ID_COLUMN_STATUS_NEED_DEFINITION",
-      "Back Log": "ID_COLUMN_STATUS_BACK_LOG",
-      "To Do": "ID_COLUMN_STATUS_TO_DO",
+      "Need definition": "ID_COLUMN_STATUS_NEED_DEFINITION",
+      "Need Definition": "ID_COLUMN_STATUS_NEED_DEFINITION", // Alternative spelling
+      Backlog: "ID_COLUMN_STATUS_BACKLOG",
+      "Back Log": "ID_COLUMN_STATUS_BACK_LOG", // Alternative spelling
+      Todo: "ID_COLUMN_STATUS_TODO",
+      "To Do": "ID_COLUMN_STATUS_TO_DO", // Alternative spelling
       "In Progress": "ID_COLUMN_STATUS_IN_PROGRESS",
       Blocked: "ID_COLUMN_STATUS_BLOCKED",
       Review: "ID_COLUMN_STATUS_REVIEW",
       Done: "ID_COLUMN_STATUS_DONE",
+      Release: "ID_COLUMN_STATUS_RELEASE",
     };
 
+    console.log("🔧 Status column mappings:");
     columns.forEach((option) => {
       const varName = statusMapping[option.name];
       if (varName) {
         console.log(`${varName}=${option.id}`);
+      } else {
+        // Show unmapped columns for debugging
+        console.log(`# Unmapped column: "${option.name}" (ID: ${option.id})`);
       }
     });
   } catch (error) {
