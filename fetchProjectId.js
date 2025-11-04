@@ -35,7 +35,7 @@ async function fetchProjectId(projectName) {
   if (ORGANIZATION) {
     const orgQuery = `query {
       organization(login: "${ORGANIZATION}") {
-        projectsV2(first: 20) {
+        projectsV2(first: 50) {
           nodes {
             id
             title
