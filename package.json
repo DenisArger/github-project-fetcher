@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --test test/**/*.test.*",
+    "test": "node --test test",
     "lint": "find . -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check"
   },
   "keywords": [],
